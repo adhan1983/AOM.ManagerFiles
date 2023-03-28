@@ -1,0 +1,29 @@
+{
+  "id": "/subscriptions/7cd42bc1-1544-4877-9c2b-9022ea869580/resourceGroups/GroupResourceFIFAManager/providers/microsoft.insights/components/aomfifamanagerplayerapi",
+  "name": "aomfifamanagerplayerapi",
+  "type": "microsoft.insights/components",
+  "location": "centralus",
+  "tags": {},
+  "kind": "web",
+  "etag": "\"2200aec1-0000-0300-0000-63b046770000\"",
+  "properties": {
+    "ApplicationId": "aomfifamanagerplayerapi",
+    "AppId": "49d08af3-043a-40d0-b3a9-af59d1f70683",
+    "Application_Type": "web",
+    "Flow_Type": "Redfield",
+    "Request_Source": "IbizaWebAppExtensionCreate",
+    "InstrumentationKey": "5d92f47c-eaa3-4e36-a104-daee733115bf",
+    "ConnectionString": "InstrumentationKey=5d92f47c-eaa3-4e36-a104-daee733115bf;IngestionEndpoint=https://centralus-2.in.applicationinsights.azure.com/;LiveEndpoint=https://centralus.livediagnostics.monitor.azure.com/",
+    "Name": "aomfifamanagerplayerapi",
+    "CreationDate": "2022-12-31T14:25:58.2884491+00:00",
+    "TenantId": "7cd42bc1-1544-4877-9c2b-9022ea869580",
+    "provisioningState": "Succeeded",
+    "SamplingPercentage": null,
+    "RetentionInDays": 90,
+    "WorkspaceResourceId": "/subscriptions/7cd42bc1-1544-4877-9c2b-9022ea869580/resourceGroups/DefaultResourceGroup-CUS/providers/Microsoft.OperationalInsights/workspaces/DefaultWorkspace-7cd42bc1-1544-4877-9c2b-9022ea869580-CUS",
+    "IngestionMode": "LogAnalytics",
+    "publicNetworkAccessForIngestion": "Enabled",
+    "publicNetworkAccessForQuery": "Enabled",
+    "Ver": "v2"
+  }
+}

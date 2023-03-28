@@ -7,11 +7,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+    <PackageReference Include="System.IO.Abstractions" Version="19.2.4" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Files\Destiny\" />
-    <Folder Include="Files\Origin\" />
   </ItemGroup>
 
 </Project>

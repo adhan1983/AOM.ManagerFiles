@@ -1,16 +1,11 @@
-﻿using ManagerFiles.Application.Interfaces;
-using ManagerFiles.Presentation.Contants;
+﻿using ManagerFiles.Presentation.Contants;
 using ManagerFiles.Presentation.Hubs;
 using ManagerFiles.Presentation.Models;
-
+using ManagerFiles.Presentation.ServicesInterfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ManagerFiles.Presentation.Controllers
@@ -19,32 +14,37 @@ namespace ManagerFiles.Presentation.Controllers
     {
         private readonly ILogger<HomeController> _logger;        
         private readonly IHubContext<BroadCastHubService> _broadCastHubService;
+        private readonly IFilePersistenceService _filePersistenceService;
 
 
-        public HomeController(IHubContext<BroadCastHubService> broadCastHubService, ILogger<HomeController> logger)
+        public HomeController(IFilePersistenceService filePersistenceService, IHubContext<BroadCastHubService> broadCastHubService, ILogger<HomeController> logger)
         {
-            _logger = logger;            
+            _logger = logger;
+            _filePersistenceService = filePersistenceService;
             _broadCastHubService = broadCastHubService;
         }
 
-        public async Task<JsonResult> Index()
-        {            
-            var counter = 0;
-            var currentCount = 0; 
+        public async Task<ActionResult> Index()
+        {
 
-            await Task.Delay(500);
-            currentCount++;
-            for (int i = 0; i < 5; i++)
-            {
-                SendFeedBack(currentCount, counter);
-                currentCount++;
-                await Task.Delay(500);
-            }
+            var result = await _filePersistenceService.GetFoldersAndFilesAsync();
+
+            //var counter = 0;
+            //var currentCount = 0; 
+
+            //await Task.Delay(500);
+            //currentCount++;
+            //for (int i = 0; i < 5; i++)
+            //{
+            //    SendFeedBack(currentCount, counter);
+            //    currentCount++;
+            //    await Task.Delay(500);
+            //}
 
 
             //var result = _filesAplicationService.GetFilesAsync();
 
-            return Json(new { error = false, data = 1 });
+            return View(result);
         }
 
         public IActionResult Privacy()

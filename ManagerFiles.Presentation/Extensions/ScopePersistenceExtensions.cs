@@ -8,7 +8,7 @@ namespace ManagerFiles.Presentation.Extensions
     {
         public static IServiceCollection AddingScopePersistence(this IServiceCollection services)
         {
-            services.AddScoped<IFilePersistence, FilePersistence>();
+            services.AddScoped<IFilePersistenceService, FilePersistenceService>();
 
             return services;
         }
