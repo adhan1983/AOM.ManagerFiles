@@ -1,21 +1,22 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-    @using ManagerFiles.Presentation.Models;
-}
+﻿@using System.Collections.Generic;
+@using ManagerFiles.Presentation.Models;
+@using System.Linq;
+@model FolderViewModel
 
 <div class="text-center">
-    
-    @{
-        @foreach (var m in Model)
-        {            
-                
-        <div>
-            <img src="~/Images/folder_icon.png")" alt="@m.Name" />
-        </div>
 
-           
-                }
-     }
+    @{
+
+        <div>@Model.Origin.Name</div>
+        foreach (var origin in Model.Origin.Files)
+        {
+            <div>@origin.Name</div>
+            <div>@origin.Name</div>
+        }
+
+
+
+    }
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>

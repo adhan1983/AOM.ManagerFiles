@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using ManagerFiles.Presentation.Hubs;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using ManagerFiles.Presentation.Hubs;
 
 namespace ManagerFiles.Presentation.Extensions
 {
@@ -29,11 +29,11 @@ namespace ManagerFiles.Presentation.Extensions
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Upload}/{action=Index}/{id?}");
                 endpoints.MapHub<BroadCastHubService>("/broadcast");
             });
 
-            
+            app.BuildingDirectories();
 
             return app;
         }

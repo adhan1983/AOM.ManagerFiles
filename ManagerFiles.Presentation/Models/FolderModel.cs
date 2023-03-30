@@ -7,5 +7,4 @@ namespace ManagerFiles.Presentation.Models
         public string Name { get; set; }
         public List<FileFolderModel> Files { get; set; } = new List<FileFolderModel>();
     }
-
 }

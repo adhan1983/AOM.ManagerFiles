@@ -1,86 +1,97 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using System.IO.Abstractions;
-using ManagerFiles.Presentation.ServicesInterfaces;
-using System.Collections.Generic;
+﻿using ManagerFiles.Presentation.Contants;
 using ManagerFiles.Presentation.Models;
+using ManagerFiles.Presentation.ServicesInterfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ManagerFiles.Presentation.Services
 {
-
-   
-
     public class FilePersistenceService : IFilePersistenceService
-    {       
-        public static IFileSystem FileSystem { get; set; } = new FileSystem();
-
-        public Task<List<FolderModel>> GetFoldersAndFilesAsync()
+    {
+        private IHostEnvironment _environment;
+        private string _filesFolder;
+        private string _originFolder;
+        private string _destinyFolder;
+        public FilePersistenceService(IHostEnvironment environment)
         {
+            _environment = environment;
+            _filesFolder = $"{_environment.ContentRootPath}{ManagerFilesConstants.FILE}";
+            _originFolder = Path.Combine(_filesFolder, ManagerFilesConstants.ORIGIN);
+            _destinyFolder = Path.Combine(_filesFolder, ManagerFilesConstants.DESTINY);
 
-            var folderAndFiles = new List<FolderModel>();
-            
-            
-            
-            string currentDirectory = Directory.GetCurrentDirectory();
+        }
+        public Task<FolderViewModel> GetFoldersAndFilesAsync()
+        {
+            var folderAndFiles = new FolderViewModel();
 
-            string filesPath = currentDirectory + "\\Files";
+            var allFolders = Directory.GetDirectories(_filesFolder);
 
-            var allFolders = Directory.GetDirectories(filesPath);
-            
             foreach (var folder in allFolders)
-            {              
+            {
                 DirectoryInfo obj = new DirectoryInfo(folder);
 
-                var folderModel = new FolderModel();
-                
-                folderModel.Name = obj.Name;
-
-                var filesFromFolder = obj.GetFiles();
-
-                foreach (var file in filesFromFolder)
+                switch (obj.Name)
                 {
-                    folderModel.Files.Add(new FileFolderModel 
-                    {
-                        Name = file.Name,
-                        TypeFile = file.Extension,
-                        
-                    });
+                    case ManagerFilesConstants.ORIGIN:
+                        folderAndFiles.Origin.Name = obj.Name;
+                        BuidFolderModel(obj, folderAndFiles.Origin);
+                        break;
+                    case ManagerFilesConstants.DESTINY:
+                        folderAndFiles.Destiny.Name = obj.Name;
+                        BuidFolderModel(obj, folderAndFiles.Destiny);
+                        break;
+                    default:
+                        break;
                 }
-
-                folderAndFiles.Add(folderModel);
-
             }
 
             return Task.FromResult(folderAndFiles);
         }
 
-
-        public Task<string> GetFilesAsync()
+        public async Task SaveFileToOriginAsync(IFormFile file)
         {
-
-            string rootPath = Directory.GetCurrentDirectory();
-
-            string origin = rootPath + "\\Files\\Origin";
-            string destiny = rootPath + "\\Files\\Destiny";
-
-            
-
-            //var assembly = typeof(FilePersistence).Assembly;
-
-            //var prefix = assembly.GetName().Name;            
-
-            //var result = Encoding.UTF8.GetString(ToByteArray(stream));
-
-            var allFiles = Directory.GetFiles(origin, "*.*", SearchOption.AllDirectories);
-
-            var _myfile = Directory.GetFiles(origin, "*employes.csv");
-            
-            foreach (string newPath in allFiles)
+            using (FileStream filestream = new FileStream(Path.Combine(_originFolder, Path.GetFileName(file.FileName)), FileMode.Create))
             {
-                File.Copy(newPath, newPath.Replace(origin, destiny), true);
+                await file.CopyToAsync(filestream);
+            }
+        }
+
+        public Task<string> CopyOrMoveFilesAsync(bool justCopy, string[] fileNames)
+        {
+            foreach (var name in fileNames)
+            {
+
+                var file = Directory.GetFiles(_originFolder, "*.*", SearchOption.AllDirectories).Where(a => a.Contains(name)).FirstOrDefault();
+                
+                File.Copy(file, file.Replace(_originFolder, _destinyFolder), true);
+                
+                if (!justCopy)
+                {
+                    File.Delete(file);
+                }
+            }            
+
+            return Task.FromResult(_destinyFolder);
+
+        }
+
+        private FolderModel BuidFolderModel(DirectoryInfo obj, FolderModel folderModel)
+        {
+            var filesFromFolder = obj.GetFiles();
+
+            foreach (var file in filesFromFolder)
+            {
+                folderModel.Files.Add(new FileFolderModel
+                {
+                    Name = file.Name,
+                    TypeFile = file.Extension,
+                });
             }
 
-            return Task.FromResult(rootPath.ToString());
+            return folderModel;
 
         }
 

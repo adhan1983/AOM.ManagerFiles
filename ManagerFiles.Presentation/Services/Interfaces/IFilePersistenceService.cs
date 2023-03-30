@@ -1,14 +1,16 @@
 ﻿using ManagerFiles.Presentation.Models;
+using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace ManagerFiles.Presentation.ServicesInterfaces
 {
     public interface IFilePersistenceService
     {
-        Task<string> GetFilesAsync();
+        Task<string> CopyOrMoveFilesAsync(bool justCopy, string[] fileNames);
 
-        Task<List<FolderModel>> GetFoldersAndFilesAsync();
+        Task<FolderViewModel> GetFoldersAndFilesAsync();
+
+        Task SaveFileToOriginAsync(IFormFile file);
 
     }
 }
