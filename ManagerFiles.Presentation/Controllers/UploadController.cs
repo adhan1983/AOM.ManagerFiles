@@ -22,28 +22,59 @@ namespace FileUpload.Controllers
         }
 
         public async Task<IActionResult> Index()
-        {
+        {           
             var result = await _filePersistenceService.GetFoldersAndFilesAsync();
             
             return View(result);
         }
 
-        public async Task<JsonResult> CopyOrMoveFilesAsync(bool justCopy, string[] files) 
+
+        [HttpPost]
+        public async Task<JsonResult> CopyOrMoveFiles([FromForm]CopyOrMovingFiles copyOrMovingFiles) 
         {
             try
-            {
-                await _filePersistenceService.CopyOrMoveFilesAsync(justCopy, files);
+            {               
+                await _filePersistenceService.CopyOrMoveFilesAsync(copyOrMovingFiles.justCopy, copyOrMovingFiles.files);
 
                 var folderAndFiles = await _filePersistenceService.GetFoldersAndFilesAsync();
 
-                return Json(new { error = true, data = folderAndFiles });
+                return Json(new { error = false, data = folderAndFiles });
             }
             catch (Exception ex)
             {
                 return JsonException(ex);
             }
-        }
+        }       
 
+        public async Task<JsonResult> UploadFile()
+        {
+            try
+            {             
+                var postedFile = Request.Form.Files;
+                
+                if (postedFile.Count <= 0 || postedFile == null)
+                {
+                    return Json(new { error = true, message = "Empty File was not uploaded" });
+                }
+
+                if (postedFile[0] == null || postedFile[0].Length <= 0)
+                {
+                    return Json(new { error = true, message = "Empty File was not uploaded" });
+                }
+
+                await _filePersistenceService.SaveFileToOriginAsync(postedFile[0]);
+
+                var folderAndFiles = _filePersistenceService.GetFoldersAndFilesAsync();
+
+                return Json(new { error = false, data = folderAndFiles });               
+
+            }
+            catch (Exception ex)
+            {
+                return JsonException(ex);
+            }
+
+        }
         private JsonResult JsonException(Exception ex)
         {
             return Json(new
@@ -53,79 +84,7 @@ namespace FileUpload.Controllers
                 ex.InnerException.Message : ex.Message
             });
         }
-
-        public async Task<JsonResult> UploadFile()
-        {
-            try
-            {               
-                var counter = 0;
-                var currentCount = 0;                
-                
-                var postedFile = Request.Form.Files;
-
-                await Task.Delay(500);
-                
-                currentCount++;
-                
-                SendFeedBack(currentCount, counter);
-
-                if (postedFile.Count <= 0 || postedFile == null)
-                {
-                    return Json(new { error = true, message = "Empty File was uploaded" });
-                }
-
-                if (postedFile[0] == null || postedFile[0].Length <= 0)
-                {
-                    return Json(new { error = true, message = "Empty File was uploaded" });
-                }
-
-                await Task.Delay(500);
-                
-                currentCount++;
-                
-                SendFeedBack(currentCount, counter);
-                
-                var fileInfo = new FileInfo(postedFile[0].FileName);
-
-                await _filePersistenceService.SaveFileToOriginAsync(postedFile[0]);
-
-                var folderAndFiles = _filePersistenceService.GetFoldersAndFilesAsync();
-
-                return Json(new { error = false, data = folderAndFiles });
-
-                //if (extention.ToLower() != ".csv")
-                //{
-                //    return Json(new { error = true, message = "invalid file format" });
-                //}     
-
-                //string[] arr = new string[] { "Task1.pdf", "employes.csv" };
-                //await _filePersistenceService.CopyOrMoveFilesAsync(false, arr);                
-
-                //await Task.Delay(500);
-
-                //currentCount++;
-
-                //SendFeedBack(currentCount, counter);
-
-            }
-            catch (Exception ex)
-            {
-                return JsonException(ex);
-            }
-
-        }
-
-        private async void SendFeedBack(int currentCount, int UploadCount)
-        {
-            var totalCount = 4;
-            var feedBackModel = new FeedbackModel()
-            {
-                currentCount = currentCount,
-                currentPercent = (currentCount * 100 / totalCount).ToString(),
-                UploadCount = UploadCount,
-            };
-            await _broadCastHubService.Clients.All.SendAsync("feedBack", feedBackModel);
-        }
+        
         public IActionResult Privacy()
         {
             return View();

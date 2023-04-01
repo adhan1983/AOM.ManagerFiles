@@ -6,7 +6,7 @@ namespace ManagerFiles.Presentation.ServicesInterfaces
 {
     public interface IFilePersistenceService
     {
-        Task<string> CopyOrMoveFilesAsync(bool justCopy, string[] fileNames);
+        Task CopyOrMoveFilesAsync(bool justCopy, string[] fileNames);
 
         Task<FolderViewModel> GetFoldersAndFilesAsync();
 

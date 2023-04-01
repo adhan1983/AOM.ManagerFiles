@@ -5,5 +5,6 @@
         public int currentCount { get; set; }
         public string currentPercent { get; set; }
         public int UploadCount { get; set; }
+        public string nameFile { get; set; }
     }
 }
