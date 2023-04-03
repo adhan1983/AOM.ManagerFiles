@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ManagerFiles.Presentation.Services
@@ -56,25 +57,37 @@ namespace ManagerFiles.Presentation.Services
             return Task.FromResult(folderAndFiles);
         }
 
+        public async Task RollBackFiles(IFormFile file)
+        {   
+            var fileNeedToBeDeleted = Directory.GetFiles(_originFolder, "*.*", SearchOption.AllDirectories).Where(a => a.Contains(file.FileName)).FirstOrDefault();
+
+            if (fileNeedToBeDeleted != null)
+            {
+                File.Delete(fileNeedToBeDeleted);                
+            }
+
+            await Task.FromResult(fileNeedToBeDeleted);
+        }
+
         public async Task SaveFileToOriginAsync(IFormFile file)
         {
             int filesTransfed = 0;
-            
-            await SendFeedBack(1, filesTransfed, $"Starting Uploading file: {file.FileName}");
-            
-            await Task.Delay(2000);
 
-            
+            await SendFeedBack(1, filesTransfed, $"Starting Uploading file: {file.FileName}");
+
+            await Task.Delay(2000);
 
             using (FileStream filestream = new FileStream(Path.Combine(_originFolder, Path.GetFileName(file.FileName)), FileMode.Create))
             {
                 filesTransfed++;
-                
+
                 await SendFeedBack(1, filesTransfed, "Uploading.......");
-                
+
                 await file.CopyToAsync(filestream);
 
-                await Task.Delay(2000);
+                await SendFeedBack(1, filesTransfed, "Finishing to store file into The Origin Folder.......");
+
+                await Task.Delay(5000);
             }
 
             await SendFeedBack(1, filesTransfed, $"Finishing Uploading file: {file.FileName}");
@@ -103,6 +116,8 @@ namespace ManagerFiles.Presentation.Services
                 
                 if (!justCopy)
                 {
+                    await SendFeedBack(totalFiles, filesTransfed, $"Deleting file: {name}");
+                    await Task.Delay(2000);
                     File.Delete(file);
                 }                
             }

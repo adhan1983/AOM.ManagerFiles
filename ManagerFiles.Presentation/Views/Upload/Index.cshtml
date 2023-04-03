@@ -69,12 +69,27 @@
     </div>
 
     <div class="col-md-12">
-        <div class="col-md-6">
-            <input type="button" class="btn btn-info btn-sm" value="Copy or Moving files" id="btnCopyAndMove" />
-        </div>
-        <div class="col-md-6">
-            <input type="checkbox" name="justCopy" id="justCopy" value="" checked="checked">
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        
+                    </th>
+                    <th>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input type="button" class="btn btn-info btn-sm" value="Copy or Moving files" id="btnCopyAndMove" />
+                    </td>
+                    <td>
+                        <span><input type="checkbox" name="justCopy" id="justCopy" value="Delete Files from origin" checked="checked">Just Copy Files</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>        
     </div>
 
 
@@ -128,9 +143,9 @@
                     </div>
                 </div>
             </div>
-        </div> <!-- / .modal-content -->
-    </div> <!-- / .modal-dialog -->
-</div> <!-- / .modal -->
+        </div> 
+    </div> 
+</div> 
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/manageFiles.js"></script>

@@ -11,6 +11,8 @@ namespace ManagerFiles.Presentation.Extensions
             services.AddSignalR();
             
             services.AddingScopePersistence();
+            
+            services.AddMvcCore();
 
             return services;
         }

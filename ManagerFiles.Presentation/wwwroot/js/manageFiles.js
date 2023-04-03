@@ -10,11 +10,7 @@
         console.log("Sinalr Connected");
     }).catch(function (err) {
         console.log(err.toString());
-    });
-
-    //$(document).ready(function () {
-    //    defaultTableContent();
-    //})
+    });    
     $("#btnUpload").click(function (e) {
         e.preventDefault();
         uploadFile();
@@ -24,7 +20,7 @@
         e.preventDefault();
         copyOrMoveFilesAsync();
     });
-    defaultTableContent();
+    defaultTableContent();   
     
 });
 
@@ -42,14 +38,7 @@ function fileSelected(input) {
 
     var file = document.getElementById('fileToUpload').files[0];
 
-    document.getElementById("uploadFile").value = file.name;
-    if (file) {
-        var fileSize = 0;
-        if (file.size > 1024 * 1024)
-            fileSize = (Math.round(file.size * 100 / (1024 * 1024)) / 100).toString() + 'MB';
-        else
-            fileSize = (Math.round(file.size * 100 / 1024) / 100).toString() + 'KB';
-    }
+    document.getElementById("uploadFile").value = file.name;    
 }
 
 function uploadFile() {
@@ -62,12 +51,14 @@ function uploadFile() {
         var xhr = new XMLHttpRequest();
         xhr.addEventListener("load", uploadComplete, false);
         xhr.addEventListener("error", uploadFailed, false);
-        xhr.addEventListener("abort", uploadCanceled, false);
+        xhr.addEventListener("abort", uploadCanceled, true);
         xhr.open("POST", url);
-        xhr.send(fd);
+        xhr.send(fd);    
+
     } else {
         alert("You are can not upload an empty file");
     }
+
 }
 
 function copyOrMoveFilesAsync() {    
@@ -81,7 +72,7 @@ function copyOrMoveFilesAsync() {
     });    
     var data = { justCopy: justCopy, files: files };
 
-    $.ajax({
+    var xhr = $.ajax({
         url: '/Upload/CopyOrMoveFiles',
         type: 'POST',
         data: data,        
@@ -92,23 +83,31 @@ function copyOrMoveFilesAsync() {
                 populateTableSource("tbodySourceFiles", result.data.origin.files, false);
             }            
         },        
-        error: function (xhr, status, error) {
-            alert("error");
-        }
-    });    
+        error: function (xhr, status, error) {            
+            xhr.abort();
+            uploadCanceled();
+        }        
+    });
+
+    $("#btnCancelMovingFiles").click(function () {
+        xhr.abort();
+    });
 
 }
 
 function uploadComplete(evt) {
-    var response = JSON.parse(evt.target.response);
-    $("#progressModal").modal("hide");
-    ResetUploadModal();
+
+    var response = JSON.parse(evt.target.response);   
+    
     if (response.error) {
         alert(response.message);
         return;
     }
+    populateTableSource("tbodySourceFiles", response.data.origin.files, false);
 
-    populateTableSource("tbodySourceFiles", response.data.result.origin.files, false);   
+    $("#progressModal").modal("hide");
+
+    ResetUploadModal();
 
 }
 
@@ -148,10 +147,9 @@ function uploadFailed(evt) {
     alert("There was an error attempting to upload the file");
 }
 
-function uploadCanceled(evt) {
+function uploadCanceled(evt) {    
     $("#progressModal").modal("hide");
     ResetUploadModal();
-    alert("The upload has been canceled by the user or the browser dropped the connection")
 }
 
 function ResetUploadModal() {
